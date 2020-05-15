@@ -23,28 +23,9 @@
         "enabled": true
       }
     },
-    "gmail": {
-      "contextualTriggers": [{
-        "unconditional": {
-        },
-        "onTriggerFunction": "onGmailMessage"
-      }],
-      "composeTrigger": {
-        "selectActions": [{
-          "text": "DeleteDate",
-          "runFunction": "onGmailCompose"
-        }],
-        "draftAccess": "NONE"
-      }
-    },
     "drive": {
       "onItemsSelectedTrigger": {
         "runFunction": "onDriveItemsSelected"
-      }
-    },
-    "calendar": {
-      "eventOpenTrigger": {
-        "runFunction": "onCalendarEventOpen"
       }
     }
   }

@@ -15,5 +15,5 @@ function onDriveItemsSelected(e) {
     title = truncate(title);
     return title;
   }).join('\n');
-  return createCatCard(text);
+  return createCard(text, true);
 }
