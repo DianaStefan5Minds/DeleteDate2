@@ -1,13 +1,8 @@
 /**
- * This simple G Suite add-on shows a random image of a cat in the sidebar. When
- * opened manually (the homepage card), some static text is overlayed on
- * the image, but when contextual cards are opened a new cat image is shown
- * with the text taken from that context (such as a message's subject line)
- * overlaying the image. There is also a button that updates the card with a
- * new random cat image.
- *
- * Click "File > Make a copy..." to copy the script, and "Publish > Deploy from
- * manifest > Install add-on" to install it.
+ * This simple G Suite add-on let's the user add a property 
+ * called delete date to selcted files. If the date of theses files is due, 
+ * the files are added to a list of manually to be delted files.
+ * This tool is beeing created in the context of DSGVO. 
  */
 
 /**
@@ -17,7 +12,7 @@ var MAX_MESSAGE_LENGTH = 40;
 
 /**
  * Callback for rendering the homepage card.
- * @return {CardService.Card} The card to show to the user.
+ * @return {CardService.Card} The card to show to the user, if nothing is selected.
  */
 function onHomepage(e) {
   console.log(e);
@@ -70,29 +65,115 @@ function createCatCard(text, isHomepage) {
       .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
   var buttonSet = CardService.newButtonSet()
       .addButton(button);
+
+      // create a date picker
+  var dateTimeInput = CardService.newDatePicker()
+  .setTitle("Löschdatum festsetzen")
+  .setFieldName("deletion_date");
+
+// create buttons with default deletion dates
+var action80d = CardService.newAction()
+  .setFunctionName('on80days')
+  .setParameters({text: "80 Tage", isHomepage: isHomepage.toString()});
+var button80d = CardService.newTextButton()
+  .setText('80 Tage')
+  .setOnClickAction(action80d)
+.setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+
+buttonSet.addButton(button80d);
   
-  // Create a button that sets a delete date to the choosen file
-  var actionAdd = CardService.newAction()
-      .setFunctionName('addDeleteDate')
-      .setParameters({text: text, isHomepage: isHomepage.toString()});
-  var buttonAdd = CardService.newTextButton()
-      .setText('Löschdatum hinzufügen')
-      .setOnClickAction(actionAdd)
-      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
-  var buttonSetAdd = CardService.newButtonSet()
-      .addButton(buttonAdd);
-
-  // Create a button that sets a delete date to the choosen file
-  var actionRemove = CardService.newAction()
-    .setFunctionName('removeDeleteDate')
+// Create a button that sets a delete date to the choosen file
+var actionAdd = CardService.newAction()
+    .setFunctionName('addDeleteDate')
     .setParameters({text: text, isHomepage: isHomepage.toString()});
-  var buttonRemove = CardService.newTextButton()
+var buttonAdd = CardService.newTextButton()
     .setText('Löschdatum hinzufügen')
-    .setOnClickAction(actionRemove)
+    .setOnClickAction(actionAdd)
     .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
-  var buttonSetRemove = CardService.newButtonSet()
-    .addButton(buttonRemove);
+var buttonSetAdd = CardService.newButtonSet()
+    .addButton(buttonAdd);
 
+// Create a button that sets a delete date to the choosen file
+var actionRemove = CardService.newAction()
+  .setFunctionName('removeDeleteDate')
+  .setParameters({text: text, isHomepage: isHomepage.toString()});
+var buttonRemove = CardService.newTextButton()
+  .setText('Löschdatum hinzufügen')
+  .setOnClickAction(actionRemove)
+  .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+var buttonSetRemove = CardService.newButtonSet()
+  .addButton(buttonRemove);
+
+// Create a footer to be shown at the bottom.
+var footer = CardService.newFixedFooter()
+    .setPrimaryButton(CardService.newTextButton()
+        .setText('Powered by cataas.com')
+        .setOpenLink(CardService.newOpenLink()
+            .setUrl('https://cataas.com')));
+
+// Assemble the widgets and return the card.
+var section = CardService.newCardSection()
+    .addWidget(image)
+    .addWidget(buttonSet)
+    .addWidget(dateTimeInput)
+    .addWidget(buttonSetAdd)
+    .addWidget(buttonSetRemove);
+
+var card = CardService.newCardBuilder()
+    .addSection(section)
+    .setFixedFooter(footer);
+
+if (!isHomepage) {
+  // Create the header shown when the card is minimized,
+  // but only when this card is a contextual card. Peek headers
+  // are never used by non-contexual cards like homepages.
+  var peekHeader = CardService.newCardHeader()
+    .setTitle('Contextual Cat')
+    .setImageUrl('https://www.gstatic.com/images/icons/material/system/1x/pets_black_48dp.png')
+    .setSubtitle(text);
+  card.setPeekCardHeader(peekHeader)
+}
+
+return card.build();
+}
+function createCalculatedCard(text, startDate, days, isHomepage) {
+  // Explicitly set the value of isHomepage as false if null or undefined.
+  if (!isHomepage) {
+    isHomepage = false;
+  }
+
+  if(!startDate) {
+    startDate = new Date();
+  }
+   
+  // Create a button that changes the cat image when pressed.
+  // Note: Action parameter keys and values must be strings.
+  var action = CardService.newAction()
+      .setFunctionName('onChangeCat')
+      .setParameters({text: text, isHomepage: isHomepage.toString()});
+  var button = CardService.newTextButton()
+      .setText('Change cat')
+      .setOnClickAction(action)
+      .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+  var buttonSet = CardService.newButtonSet()
+      .addButton(button);
+
+  // create a date picker
+  var dateTimeInput = CardService.newDatePicker()
+      .setTitle("Löschdatum festsetzen")
+      .setFieldName("deletion_date");
+  
+  // create buttons with default deletion dates
+  var action80d = CardService.newAction()
+      .setFunctionName('on80days')
+      .setParameters({text: "80 Tage", isHomepage: isHomepage.toString()});
+  var button80d = CardService.newTextButton()
+      .setText('80 Tage')
+      .setOnClickAction(action80d)
+  .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
+  
+  buttonSet.addButton(button80d);
+  
   // Create a footer to be shown at the bottom.
   var footer = CardService.newFixedFooter()
       .setPrimaryButton(CardService.newTextButton()
@@ -103,10 +184,8 @@ function createCatCard(text, isHomepage) {
   // Assemble the widgets and return the card.
   var section = CardService.newCardSection()
       .addWidget(image)
-      .addWidget(buttonSet)
-      .addWidget(buttonSetAdd)
-      .addWidget(buttonSetRemove);
-
+      .addWidget(dateTimeInput)
+      .addWidget(buttonSet);
   var card = CardService.newCardBuilder()
       .addSection(section)
       .setFixedFooter(footer);
@@ -152,6 +231,23 @@ function onChangeCat(e) {
       .setNavigation(navigation);
   return actionResponse.build();
 }
+
+/**
+ * Callback fot the "80 Tage" button.
+ */
+function on80days(e) {
+  console.log(e);
+  var text = e.parameters.text;
+  var isHomepage = e.paramerts.isHomepage === 'true';
+  
+  var card = createCalculatedCard(text, startDate, days, isHomepage);
+  var navigation = CardService.newNavigation()
+  .updateCard(card);
+  var actionResponse = CardService.newActionResponseBuilder()
+  .setNavigation(navigation);
+  return actionResponse.build();
+}
+
 
 /**
  * Truncate a message to fit in the cat image.

@@ -1,20 +1,22 @@
 {
   "timeZone": "Europe/Paris",
-  "dependencies": {},
+  "dependencies": {
+    "enabledAdvancedServices": [{
+    "userSymbol": "Drive",
+    "serviceId": "drive",
+    "version": "v2"
+  }]},
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
   "oauthScopes": [
-    "https://www.googleapis.com/auth/calendar.addons.execute",
-    "https://www.googleapis.com/auth/calendar.readonly",
-    "https://www.googleapis.com/auth/drive.addons.metadata.readonly",
-    "https://www.googleapis.com/auth/gmail.addons.current.action.compose",
-    "https://www.googleapis.com/auth/gmail.addons.current.message.readonly",
-    "https://www.googleapis.com/auth/gmail.addons.execute",
-    "https://www.googleapis.com/auth/script.locale"],
+    "https://www.googleapis.com/auth/drive.addons.metadata.readonly", 
+    "https://www.googleapis.com/auth/script.locale", 
+    "https://www.googleapis.com/auth/drive"
+],
   "addOns": {
     "common": {
       "name": "DeleteDate",
-       "logoUrl": "https://image.flaticon.com/icons/svg/2912/2912598.svg",
+       "logoUrl": "https://docs.google.com/drawings/d/1ZKJpeQQ7j0kFfl1OcG6L8ou5rS9LFDlPMgBpiBSoqyU/edit?usp=sharing",
       "useLocaleFromApp": true,
       "homepageTrigger": {
         "runFunction": "onHomepage",
