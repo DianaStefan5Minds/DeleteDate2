@@ -9,7 +9,8 @@ function onDriveItemsSelected(e) {
   // Include at most 5 items in the text.
   items = items.slice(0, 5);
   var text = items.map(function(item) {
-    var title = item.title;
+    var createdAt = DriveApp.getFileById(item.id).getDateCreated();
+    var title = item.title + '\n' + createdAt;
     // If neccessary, truncate the title to fit in the image.
     title = truncate(title);
     return title;
