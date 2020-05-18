@@ -69,7 +69,8 @@ function createCard(text, isAtLeastOneFileSelected) {
     .setTextButtonStyle(CardService.TextButtonStyle.FILLED);
   
   var action = CardService.newAction()
-      .setFunctionName('notificationCallback');
+      .setFunctionName('notificationCallback')
+      .setParameters({message: text});
   var actionButton = CardService.newTextButton()
       .setText('Create notification')
       .setOnClickAction(action);
@@ -80,11 +81,17 @@ function createCard(text, isAtLeastOneFileSelected) {
   .addButton(buttonRemove)
   .addButton(actionButton);
 
+  // Show a small instruction.
+  var choosenFilesText = CardService.newTextParagraph()
+  .setText(text);
+  
+
   // Assemble the widgets and return the card.
   var section = CardService.newCardSection()
     .addWidget(instructionText)
     .addWidget(dateTimeInput)
-    .addWidget(buttonSet);
+    .addWidget(buttonSet)
+    .addWidget(choosenFilesText);
 
   var card = CardService.newCardBuilder()
       .addSection(section)
@@ -150,12 +157,19 @@ function truncate(message) {
   return message;
 }
 
-
-
-
-function notificationCallback() {
+/**
+ * Shows a notification with the given message
+ * @param {String} message 
+ * @returns {Notification} the wanted notification.
+ */
+function notificationCallback(message) {
+  Logger.log(message);
+  
   return CardService.newActionResponseBuilder()
-      .setNotification(CardService.newNotification()
-          .setText("Some info to display to user"))
+      .setNotification(
+        CardService
+        .newNotification()
+        .setText(message.toString())
+      )
       .build();
     }
