@@ -162,14 +162,13 @@ function truncate(message) {
  * @param {String} message 
  * @returns {Notification} the wanted notification.
  */
-function notificationCallback(message) {
-  Logger.log(message);
-  
+function notificationCallback(e) {
+
   return CardService.newActionResponseBuilder()
       .setNotification(
         CardService
         .newNotification()
-        .setText(message.toString())
+        .setText(e.parameters.message.toString())
       )
       .build();
     }
